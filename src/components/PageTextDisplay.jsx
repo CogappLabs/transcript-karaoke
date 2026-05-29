@@ -27,6 +27,9 @@ const PageTextDisplay = forwardRef(
     const textContainerRef = useRef(null);
     const boxContainerRef = useRef(null);
     const styleRef = useRef(null);
+    const highlightRectRef = useRef(null);
+    const ballRef = useRef(null);
+    const ballAnimRef = useRef(null);
 
     useEffect(() => {
       const textContainer = textContainerRef.current;
@@ -85,6 +88,60 @@ const PageTextDisplay = forwardRef(
             `scale(${scaleFactor})`,
           ].join(' ');
         },
+
+        highlightWord(box) {
+          const rect = highlightRectRef.current;
+          if (!rect) return;
+          if (!box) {
+            rect.style.display = 'none';
+            return;
+          }
+          rect.setAttribute('x', box.x);
+          rect.setAttribute('y', box.y);
+          rect.setAttribute('width', box.width);
+          rect.setAttribute('height', box.height);
+          rect.style.display = null;
+        },
+
+        moveBallTo(box, fromBox) {
+          const ball = ballRef.current;
+          if (!ball) return;
+
+          const r = box.height * 0.4;
+          const cx2 = box.x + box.width / 2;
+          const cy2 = box.y - r - 2;
+
+          ball.setAttribute('r', r);
+          ball.setAttribute('cx', cx2);
+          ball.setAttribute('cy', cy2);
+          ball.style.display = null;
+
+          if (fromBox) {
+            const cx1 = fromBox.x + fromBox.width / 2;
+            const cy1 = fromBox.y - fromBox.height * 0.4 - 2;
+            const dx = cx2 - cx1;
+            const dy = cy2 - cy1;
+            const bounceHeight = box.height * 2;
+            const midX = -dx * 0.5;
+            const midY = -dy * 0.5 - bounceHeight;
+
+            ballAnimRef.current?.cancel();
+            ballAnimRef.current = ball.animate(
+              [
+                { transform: `translate(${-dx}px, ${-dy}px)` },
+                { transform: `translate(${midX}px, ${midY}px)` },
+                { transform: 'translate(0, 0)' },
+              ],
+              { duration: 300, easing: 'ease-in-out' },
+            );
+          }
+        },
+
+        clearBall() {
+          ballAnimRef.current?.cancel();
+          ballAnimRef.current = null;
+          if (ballRef.current) ballRef.current.style.display = 'none';
+        },
       }),
       [pageHeight, pageWidth, theme],
     );
@@ -139,6 +196,11 @@ const PageTextDisplay = forwardRef(
               />
             ))}
           </g>
+          <rect
+            ref={highlightRectRef}
+            rx="3"
+            style={{ display: 'none', fill: 'rgba(255, 200, 0, 0.55)', pointerEvents: 'none' }}
+          />
         </svg>
         <svg
           className="mirador-textoverlay__text-overlay"
@@ -148,6 +210,10 @@ const PageTextDisplay = forwardRef(
           }}
         >
           <style ref={styleRef}>{getStyleText(theme, selectable)}</style>
+          <circle
+            ref={ballRef}
+            style={{ display: 'none', fill: '#FFD700', pointerEvents: 'none' }}
+          />
           <g ref={textContainerRef}>
             {renderLines.map((line) =>
               line.spans ? (

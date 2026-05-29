@@ -39,7 +39,7 @@ const config = {
   windows: [
     {
       canvasIndex: 8,
-      manifestId: 'https://wellcomelibrary.org/iiif/b18035723/manifest',
+      manifestId: 'https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb10614001_00159_u001/manifest',
       view: 'single',
     },
   ],

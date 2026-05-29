@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
+import { onKaraokeActive, onKaraokeWord } from './karaokeState';
 import PageTextDisplay from './PageTextDisplay';
 
 /** Overlay that renders OCR or transcription text in a SVG.
@@ -15,6 +16,7 @@ class MiradorTextOverlay extends Component {
   constructor(props) {
     super(props);
 
+    this.state = { karaokeActive: false };
     this.renderRefs = [];
     this.renderRefCallbacks = [];
     this.containerRef = React.createRef();
@@ -28,11 +30,35 @@ class MiradorTextOverlay extends Component {
       this.registerOsdCallback();
     }
     this.patchAnnotationOverlay();
+    this.prevKaraokeWord = null;
+    this.unsubKaraokeWord = onKaraokeWord((word) => {
+      const prev = this.prevKaraokeWord;
+      this.prevKaraokeWord = word;
+      this.renderRefs.forEach((ref, i) => {
+        if (!word) {
+          ref?.highlightWord(null);
+          ref?.clearBall();
+          return;
+        }
+        if (word.pageIndex === i) {
+          ref?.highlightWord(word);
+          ref?.moveBallTo(word, prev?.pageIndex === i ? prev : null);
+        } else {
+          ref?.highlightWord(null);
+          ref?.clearBall();
+        }
+      });
+    });
+    this.unsubKaraokeActive = onKaraokeActive((active) => {
+      this.setState({ karaokeActive: active });
+    });
   }
 
   /** Remove OpenSeadragon callback when unmounting */
   componentWillUnmount() {
     this.unregisterOsdCallback();
+    this.unsubKaraokeWord?.();
+    this.unsubKaraokeActive?.();
   }
 
   /** Register OpenSeadragon callback when viewport changes */
@@ -249,6 +275,7 @@ class MiradorTextOverlay extends Component {
   render() {
     const { pageTexts, selectable, visible, viewer, opacity, textColor, bgColor, useAutoColors } =
       this.props;
+    const { karaokeActive } = this.state;
     if (!this.shouldRender() || !viewer || !pageTexts) {
       return null;
     }
@@ -258,7 +285,7 @@ class MiradorTextOverlay extends Component {
         ref={this.containerRef}
         style={{
           position: 'absolute',
-          display: selectable || visible ? null : 'none',
+          display: selectable || visible || karaokeActive ? null : 'none',
         }}
       >
         {pageTexts.map((page, idx) => {

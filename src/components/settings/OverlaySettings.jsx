@@ -12,7 +12,9 @@ import { MiradorMenuButton } from 'mirador';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 
+import KaraokeIcon from '../KaraokeIcon';
 import TextSelectIcon from '../TextSelectIcon';
+import useKaraoke from '../useKaraoke';
 import ButtonContainer from './ButtonContainer';
 import ColorWidget from './ColorWidget';
 import OpacityWidget from './OpacityWidget';
@@ -21,6 +23,7 @@ export default function OverlaySettings({
   containerId,
   imageToolsEnabled,
   pageColors,
+  pageTexts,
   t,
   textsAvailable,
   textsFetching,
@@ -39,6 +42,8 @@ export default function OverlaySettings({
   const [open, setOpen] = useState(enabled && (visible || selectable));
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showOpacitySlider, setShowOpacitySlider] = useState(false);
+  const [karaokeActive, setKaraokeActive] = useState(false);
+  useKaraoke(karaokeActive, pageTexts);
   const theme = useTheme();
   const isSmallDisplay = useMediaQuery(theme.breakpoints.down('sm'));
   const bubbleBg = theme.palette?.shades?.main ?? theme.palette.background.paper;
@@ -182,6 +187,17 @@ export default function OverlaySettings({
               />
             )}
           </ButtonContainer>
+          <ButtonContainer paddingPrev={8}>
+            <MiradorMenuButton
+              aria-label={t('karaokeMode')}
+              aria-pressed={karaokeActive}
+              containerId={containerId}
+              sx={{ backgroundColor: karaokeActive ? toggledBubbleBg : 'transparent' }}
+              onClick={() => setKaraokeActive(!karaokeActive)}
+            >
+              <KaraokeIcon />
+            </MiradorMenuButton>
+          </ButtonContainer>
         </>
       )}
       {textsFetching && (
@@ -207,9 +223,14 @@ OverlaySettings.propTypes = {
       textColor: PropTypes.string,
     }),
   ).isRequired,
+  pageTexts: PropTypes.array,
   t: PropTypes.func.isRequired,
   textsAvailable: PropTypes.bool.isRequired,
   textsFetching: PropTypes.bool.isRequired,
   updateWindowTextOverlayOptions: PropTypes.func.isRequired,
   windowTextOverlayOptions: PropTypes.object.isRequired,
+};
+
+OverlaySettings.defaultProps = {
+  pageTexts: [],
 };

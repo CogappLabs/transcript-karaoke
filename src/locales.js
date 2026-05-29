@@ -26,6 +26,7 @@ export default {
     backgroundColor: 'Line background color',
     resetTextColors: 'Reset colors',
     opacityCurrentValue: 'Current text opacity: {{value}} percent',
+    karaokeMode: 'Karaoke mode',
   },
   sr: {
     collapseTextOverlayOptions: 'Затворите опције приказа текста',

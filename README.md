@@ -1,4 +1,10 @@
-# mirador-textoverlay
+# Transcript karaoke
+
+An extension to the excellent [mirador-textoverlay plugin](https://github.com/dbmdz/mirador-textoverlay) that adds a karaoke button which will read out the text while bouncing a little ball on top.
+
+A silly vibe-coded experiment by Tristan Roddis in no way intended as a real addition. Plus it's hard-coded to use a German voice to match the demo manifest.
+
+Full README for `mirador-textoverlay` follows:
 
 [![npm package][npm-badge]][npm]
 [![required Mirador version][mirador-badge]][mirador]

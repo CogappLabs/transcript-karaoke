@@ -10,6 +10,7 @@ import {
   getWindowTextOverlayOptions,
 } from './state/selectors';
 
+
 const plugin = [
   {
     component: MiradorTextOverlay,
@@ -37,6 +38,7 @@ const plugin = [
       return {
         containerId: getContainerId(state),
         imageToolsEnabled,
+        pageTexts: getPageTexts(state, { windowId }),
         pageColors: getTextsForVisibleCanvases(state, { windowId })
           .filter((page) => page !== undefined)
           .map(({ textColor, bgColor }) => ({
