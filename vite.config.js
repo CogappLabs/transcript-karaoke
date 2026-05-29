@@ -38,6 +38,7 @@ const pluginConfig = {
 };
 
 const demoConfig = {
+  base: process.env.VITE_BASE_PATH ?? '/',
   build: {
     outDir: resolve(__dirname, 'demo/dist'),
     rollupOptions: {
